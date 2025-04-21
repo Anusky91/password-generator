@@ -16,10 +16,12 @@ public class Main {
                 ApplicationMenu.findCredencial(servicio);
             }
             case "3" -> {
-                System.out.println("Opcion 3");
+                System.out.println("Ha elegido modificar una credencial.");
+                ApplicationMenu.updateCredencial(scanner);
             }
             case "4" -> {
-                System.out.println("Opcion 4");
+                System.out.println("Ha elegido borrar una credencial.");
+                ApplicationMenu.deleteCredencial(scanner);
             }
             case "0" -> {
                 System.out.println("Ha elegido salir de la aplicación!");

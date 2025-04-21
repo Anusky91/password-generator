@@ -1,6 +1,7 @@
 package org.example;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -25,43 +26,60 @@ public class ApplicationMenu {
     public static void newCredentialQuestionnaire(Scanner scanner) {
         System.out.println("Nombre del servicio. (Solo una palabra)");
         String servicio = scanner.next();
-        System.out.println("Nombre de usuario.");
-        String usuario = scanner.next();
-        System.out.println("Que longitud debe tener la contraseña: \n");
-        String longitud = scanner.next();
-        System.out.println("Quieres que tenga mayusculas? S/N \n");
-        String mayusculas = scanner.next();
-        System.out.println("Quieres que tenga minusculas? S/N \n");
-        String minusculas = scanner.next();
-        System.out.println("Quieres que tenga numeros? S/N \n");
-        String numeros = scanner.next();
-        System.out.println("Quieres que tenga simbolos? S/N \n");
-        String simbolos = scanner.next();
-        //System.out.println("Cuantas contraseñas quieres generar? \n");
-        //String cantidad = scanner.next();
 
-        int intLongitud = parseLongitud(longitud);
-        boolean isMayusculas = parseBoolean(mayusculas);
-        boolean isMinusculas = parseBoolean(minusculas);
-        boolean isNumeros = parseBoolean(numeros);
-        boolean isSimbolos = parseBoolean(simbolos);
-        //int intCantidad = Integer.parseInt(cantidad);
+        PasswordDefinition result = getPasswordDefinition(scanner);
 
-        PasswordGenerator passwordGenerator = new PasswordGenerator(intLongitud, isMayusculas, isMinusculas, isNumeros, isSimbolos);
+        PasswordGenerator passwordGenerator = new PasswordGenerator(result.intLongitud(),
+                                                                result.isMayusculas(),
+                                                                result.isMinusculas(),
+                                                                result.isNumeros(),
+                                                                result.isSimbolos());
 
-        String password = passwordGenerator.generate();
-        System.out.println("\nTu nueva contraseña segura es:\n🔐 " + password + "\n");
-        /*
-        if (intCantidad > 1) {
-            for (int i = 0; i < intCantidad; i++) {
-                System.out.println("🔐 " + passwordGenerator.generate());
-            }
-        } else {
-            String password = passwordGenerator.generate();
-            System.out.println("\nTu nueva contraseña segura es:\n🔐 " + password + "\n");
+        Credencial credencial = getCredencial(scanner, passwordGenerator, servicio, result.usuario());
+        saveCredencial(credencial);
+    }
+
+    private static Credencial getCredencial(Scanner scanner, PasswordGenerator passwordGenerator, String servicio, String usuario) {
+        System.out.println("¿Cuántas contraseñas quieres generar?");
+        int cantidad = scanner.nextInt();
+        List<String> posiblesPasswords = new ArrayList<>();
+
+        for (int i = 0; i < cantidad; i++) {
+            posiblesPasswords.add(passwordGenerator.generate());
+            System.out.println((i + 1) + ". " + posiblesPasswords.get(i));
         }
-        */
-        Credencial credencial = new Credencial(servicio, usuario, password);
+
+        System.out.println("Elige la contraseña deseada (1-" + cantidad + "):");
+        int eleccion = scanner.nextInt();
+        String passwordElegida = posiblesPasswords.get(eleccion - 1);
+        System.out.println("\nTu nueva contraseña segura es:\n🔐 " + passwordElegida + "\n");
+
+        Credencial credencial = new Credencial(servicio, usuario, passwordElegida);
+        return credencial;
+    }
+
+
+    public static void updateCredencial(Scanner scanner) {
+        System.out.println("Introduzca el nombre del servicio que desea modificar");
+        String servicio = scanner.next();
+        PasswordDefinition result = getPasswordDefinition(scanner);
+
+        PasswordGenerator passwordGenerator = new PasswordGenerator(result.intLongitud(),
+                                                        result.isMayusculas(),
+                                                        result.isMinusculas(),
+                                                        result.isNumeros(),
+                                                        result.isSimbolos());
+
+        Credencial credencial = getCredencial(scanner, passwordGenerator, servicio, result.usuario());
+        try {
+            fileUpdater.update(credencial);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
+
+    private static void saveCredencial(Credencial credencial) {
         System.out.println(credencial.toString());
         try {
             fileUpdater.create(credencial);
@@ -81,6 +99,16 @@ public class ApplicationMenu {
         }
     }
 
+    public static void deleteCredencial(Scanner scanner) {
+        System.out.println("Introduzca el nombre del servicio que desea borrar");
+        String servicio = scanner.next();
+        try {
+            fileUpdater.delete(servicio);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     private static boolean parseBoolean(String siono) {
         return siono.equalsIgnoreCase("S");
     }
@@ -91,5 +119,35 @@ public class ApplicationMenu {
         } catch (NumberFormatException e) {
             return 12;
         }
+    }
+    private static PasswordDefinition getPasswordDefinition(Scanner scanner) {
+        System.out.println("Nombre de usuario.");
+        String usuario = scanner.next();
+        System.out.println("Que longitud debe tener la contraseña: \n");
+        String longitud = scanner.next();
+        System.out.println("Quieres que tenga mayusculas? S/N \n");
+        String mayusculas = scanner.next();
+        System.out.println("Quieres que tenga minusculas? S/N \n");
+        String minusculas = scanner.next();
+        System.out.println("Quieres que tenga numeros? S/N \n");
+        String numeros = scanner.next();
+        System.out.println("Quieres que tenga simbolos? S/N \n");
+        String simbolos = scanner.next();
+
+        int intLongitud = parseLongitud(longitud);
+        boolean isMayusculas = parseBoolean(mayusculas);
+        boolean isMinusculas = parseBoolean(minusculas);
+        boolean isNumeros = parseBoolean(numeros);
+        boolean isSimbolos = parseBoolean(simbolos);
+        PasswordDefinition result = new PasswordDefinition(usuario, intLongitud, isMayusculas, isMinusculas, isNumeros, isSimbolos);
+        return result;
+    }
+
+    private record PasswordDefinition(String usuario,
+                                      int intLongitud,
+                                      boolean isMayusculas,
+                                      boolean isMinusculas,
+                                      boolean isNumeros,
+                                      boolean isSimbolos) {
     }
 }

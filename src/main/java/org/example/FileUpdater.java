@@ -3,6 +3,7 @@ package org.example;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FileUpdater {
 
@@ -26,5 +27,38 @@ public class FileUpdater {
             credencialList.add(credencial);
         }
         return credencialList;
+    }
+
+    public void update(Credencial credencial) throws IOException {
+        List<Credencial> credencialList = findAll();
+        List<Credencial> newCredentialList = credencialList.stream().filter(c -> !c.getService().equalsIgnoreCase(credencial.getService())).collect(Collectors.toList());
+        newCredentialList.add(credencial);
+        FileWriter fileWriter = new FileWriter(file, false);
+        try {
+            for (Credencial cr : newCredentialList){
+                fileWriter.append(cr.toFile());
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            fileWriter.flush();
+            fileWriter.close();
+        }
+    }
+
+    public void delete(String servicio) throws IOException {
+        List<Credencial> credencialList = findAll();
+        List<Credencial> newCredentialList = credencialList.stream().filter(c -> !c.getService().equalsIgnoreCase(servicio)).collect(Collectors.toList());
+        FileWriter fileWriter = new FileWriter(file, false);
+        try {
+            for (Credencial cr : newCredentialList){
+                fileWriter.append(cr.toFile());
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            fileWriter.flush();
+            fileWriter.close();
+        }
     }
 }
