@@ -12,7 +12,7 @@ public class Credencial {
     private final String password;
 
     public String toFile() {
-        return service + ";" + user + ";" + password + "\n";
+        return service + ";" + user + ";" + password;
     }
 
     @Override

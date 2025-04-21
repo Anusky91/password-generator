@@ -17,6 +17,7 @@ public class ApplicationMenu {
                 2. Recuperar una credencial.
                 3. Modificar una credencial.
                 4. Borrar una credencial.
+                5. Recuperar los nombres de los servicios guardados.
                 0. Salir.
                 """);
 
@@ -43,19 +44,24 @@ public class ApplicationMenu {
         System.out.println("¿Cuántas contraseñas quieres generar?");
         int cantidad = scanner.nextInt();
         List<String> posiblesPasswords = new ArrayList<>();
+        int eleccion = 0;
+        String passwordElegida = "";
 
-        for (int i = 0; i < cantidad; i++) {
-            posiblesPasswords.add(passwordGenerator.generate());
-            System.out.println((i + 1) + ". " + posiblesPasswords.get(i));
+        if (cantidad != 1) {
+            for (int i = 0; i < cantidad; i++) {
+                posiblesPasswords.add(passwordGenerator.generate());
+                System.out.println((i + 1) + ". " + posiblesPasswords.get(i));
+            }
+
+            System.out.println("Elige la contraseña deseada (1-" + cantidad + "):");
+            eleccion = scanner.nextInt();
+            passwordElegida = posiblesPasswords.get(eleccion - 1);
+        } else {
+            passwordElegida = passwordGenerator.generate();
         }
-
-        System.out.println("Elige la contraseña deseada (1-" + cantidad + "):");
-        int eleccion = scanner.nextInt();
-        String passwordElegida = posiblesPasswords.get(eleccion - 1);
         System.out.println("\nTu nueva contraseña segura es:\n🔐 " + passwordElegida + "\n");
 
-        Credencial credencial = new Credencial(servicio, usuario, passwordElegida);
-        return credencial;
+        return new Credencial(servicio, usuario, passwordElegida);
     }
 
 
@@ -77,6 +83,15 @@ public class ApplicationMenu {
             System.out.println(e.getMessage());
         }
 
+    }
+
+    public static void findAllServicesNames() {
+        try {
+            List<Credencial> credencialList = fileUpdater.findAll();
+            credencialList.stream().map(Credencial::getService).forEach(System.out::println);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private static void saveCredencial(Credencial credencial) {

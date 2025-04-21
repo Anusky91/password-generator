@@ -23,6 +23,10 @@ public class Main {
                 System.out.println("Ha elegido borrar una credencial.");
                 ApplicationMenu.deleteCredencial(scanner);
             }
+            case "5" -> {
+                System.out.println("Ha elegido ver los nombres de los servicios guardados.");
+                ApplicationMenu.findAllServicesNames();
+            }
             case "0" -> {
                 System.out.println("Ha elegido salir de la aplicación!");
             }
