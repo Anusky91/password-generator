@@ -19,6 +19,7 @@ public class ApplicationMenu {
                 3. Modificar una credencial.
                 4. Borrar una credencial.
                 5. Recuperar los nombres de los servicios guardados.
+                6. Busqueda rápida de credencial.
                 0. Salir.
                 """);
 
@@ -87,12 +88,25 @@ public class ApplicationMenu {
     }
 
     public static void findAllServicesNames() {
+        System.out.println("==============================================");
+        System.out.println("Servicios guardados:");
         try {
             List<Credencial> credencialList = fileUpdater.findAll();
             credencialList.stream().map(Credencial::getService)
                     .map(name -> name.toUpperCase().charAt(0) + name.substring(1))
                     .sorted(Comparator.naturalOrder())
                     .forEach(System.out::println);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        System.out.println("==============================================");
+    }
+
+    public static void fastSearch(String lookFor) {
+        try {
+            List<Credencial> credencialList = fileUpdater.findAll();
+            if (credencialList.isEmpty()) System.out.println("** Sin resultados para " + lookFor);
+            credencialList.stream().filter( credencial -> credencial.getService().contains(lookFor)).forEach(System.out::println);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }

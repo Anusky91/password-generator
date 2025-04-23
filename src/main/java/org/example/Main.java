@@ -27,6 +27,12 @@ public class Main {
                 System.out.println("Ha elegido ver los nombres de los servicios guardados.");
                 ApplicationMenu.findAllServicesNames();
             }
+            case "6" -> {
+                System.out.println("Ha elegido busqueda rápida. \nIntroduzca los datos a buscar:");
+                scanner.nextLine();
+                String lookFor = scanner.nextLine();
+                ApplicationMenu.fastSearch(lookFor);
+            }
             case "0" -> {
                 System.out.println("Ha elegido salir de la aplicación!");
             }
