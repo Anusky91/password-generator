@@ -2,6 +2,7 @@ package org.example;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -88,7 +89,10 @@ public class ApplicationMenu {
     public static void findAllServicesNames() {
         try {
             List<Credencial> credencialList = fileUpdater.findAll();
-            credencialList.stream().map(Credencial::getService).forEach(System.out::println);
+            credencialList.stream().map(Credencial::getService)
+                    .map(name -> name.toUpperCase().charAt(0) + name.substring(1))
+                    .sorted(Comparator.naturalOrder())
+                    .forEach(System.out::println);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
